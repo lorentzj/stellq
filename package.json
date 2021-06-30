@@ -1,0 +1,23 @@
+{
+  "name": "stellq",
+  "version": "1.0.0",
+  "description": "Live Demo: https://lorentzj.github.io/stellq/",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lorentzj/stellq.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lorentzj/stellq/issues"
+  },
+  "homepage": "https://github.com/lorentzj/stellq#readme",
+  "devDependencies": {
+    "typescript": "^4.3.4"
+  }
+}
