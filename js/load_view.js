@@ -4,10 +4,14 @@ function load_view() {
     if (canvasElements.length !== 0) {
         const gl = canvasElements[0].getContext("webgl2");
         if (gl) {
-            compileShaderProgram("/glsl/star.vert", "/glsl/star.frag", gl);
+            compileShaderProgram("/glsl/star.vert", "/glsl/star.frag", gl).then(program => {
+                if (program !== null) {
+                    console.log(program);
+                }
+            });
         }
         else {
-            console.error("Could not create WebGL2 gl.");
+            console.error("Could not create WebGL2 context.");
         }
     }
     else {
@@ -37,44 +41,35 @@ function compileShaderProgram(vPath, fPath, gl) {
             }
             else {
                 const [vSource, fSource] = source;
-                const vShader = gl.createShader(gl.VERTEX_SHADER);
-                const fShader = gl.createShader(gl.FRAGMENT_SHADER);
-                if (vShader === null || fShader === null) {
-                    console.error("Failed to create shader objects.");
-                }
-                else {
-                    gl.shaderSource(vShader, vSource);
-                    gl.compileShader(vShader);
-                    const vShaderLog = gl.getShaderInfoLog(vShader);
-                    if (vShaderLog !== "") {
-                        console.error("Failed to compile vertex shader.");
-                        console.error(vShaderLog);
-                        return null;
-                    }
-                    gl.attachShader(program, vShader);
-                    gl.deleteShader(vShader);
-                    gl.shaderSource(fShader, fSource);
-                    gl.compileShader(fShader);
-                    const fShaderLog = gl.getShaderInfoLog(fShader);
-                    if (fShaderLog !== "") {
-                        console.error("Failed to compile fragment shader.");
-                        console.error(fShaderLog);
-                        return null;
-                    }
-                    gl.attachShader(program, fShader);
-                    gl.deleteShader(fShader);
-                    gl.linkProgram(program);
-                    const programLog = gl.getProgramInfoLog(program);
-                    if (programLog !== "") {
-                        console.error("Failed to link shader program.");
-                        console.error(programLog);
-                        return null;
-                    }
+                const vSuccess = attachShaderFromSource(vSource, program, gl, gl.VERTEX_SHADER);
+                const fSuccess = attachShaderFromSource(fSource, program, gl, gl.FRAGMENT_SHADER);
+                if (vSuccess && fSuccess) {
                     return program;
                 }
+                else {
+                    return null;
+                }
             }
-            return null;
         });
+    }
+}
+function attachShaderFromSource(source, program, gl, type) {
+    const shader = gl.createShader(type);
+    if (shader === null) {
+        return false;
+    }
+    else {
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        const shaderLog = gl.getShaderInfoLog(shader);
+        if (shaderLog !== "") {
+            console.error("Failed to compile shader.");
+            console.error(shaderLog);
+            return false;
+        }
+        gl.attachShader(program, shader);
+        gl.deleteShader(shader);
+        return true;
     }
 }
 document.body.onload = load_view;
