@@ -10,6 +10,7 @@ jobs:
       - name: compile ts 
         run: |
           rm .gitignore
+          npm init -y
           npm install -i typescript --save-dev
           npx tsc
 
