@@ -24,6 +24,7 @@ document.body.onload = () => {
         canvas.height = Math.round(cHeight * devicePixelRatio);
         const gl = canvas.getContext("webgl2");
         if (gl) {
+            gl.viewport(0, 0, canvas.width, canvas.height);
             star.createStarContext(gl, 1000).then(starContext => {
                 if (starContext !== null) {
                     createRenderLoop(gl, starContext);
