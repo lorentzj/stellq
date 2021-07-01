@@ -24,7 +24,16 @@ export function compileShaderProgram(vPath, fPath, gl) {
                 const vSuccess = attachShaderFromSource(vSource, program, gl, gl.VERTEX_SHADER);
                 const fSuccess = attachShaderFromSource(fSource, program, gl, gl.FRAGMENT_SHADER);
                 if (vSuccess && fSuccess) {
-                    return program;
+                    gl.linkProgram(program);
+                    const programLog = gl.getProgramInfoLog(program);
+                    if (programLog !== "") {
+                        console.error("Failed to link shader program.");
+                        console.error(programLog);
+                        return null;
+                    }
+                    else {
+                        return program;
+                    }
                 }
                 else {
                     return null;
