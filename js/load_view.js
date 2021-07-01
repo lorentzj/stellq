@@ -1,12 +1,15 @@
-import * as star from "./star_context.js";
-function createRenderLoop(gl, starContext) {
+import * as star from "./render_stars.js";
+import * as player from "./player.js";
+function createRenderLoop(gl, starContext, playerState) {
+    let prevTime = (new Date()).getTime();
     const draw = () => {
         gl.clearColor(0, 0, 0, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        starContext.updateShimmerTimer((new Date()).getTime());
-        gl.useProgram(starContext.program);
-        gl.bindVertexArray(starContext.vao);
-        gl.drawElements(gl.TRIANGLES, starContext.nStars * 4, gl.UNSIGNED_SHORT, 0);
+        star.renderStars(gl, starContext);
+        const currentTime = (new Date()).getTime();
+        const deltaT = currentTime - prevTime;
+        prevTime = currentTime;
+        playerState.update(deltaT);
         requestAnimationFrame(draw);
     };
     draw();
@@ -29,7 +32,8 @@ document.body.onload = () => {
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
             star.createStarContext(gl, 500).then(starContext => {
                 if (starContext !== null) {
-                    createRenderLoop(gl, starContext);
+                    const playerState = new player.PlayerState();
+                    createRenderLoop(gl, starContext, playerState);
                 }
             });
         }
