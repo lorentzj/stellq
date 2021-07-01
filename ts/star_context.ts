@@ -66,7 +66,9 @@ function createStarVAO(gl: WebGL2RenderingContext, stars: Star[]): WebGLVertexAr
     if(vao !== null) {
         gl.bindVertexArray(vao);
         const vbo = gl.createBuffer();
-        if(vbo !== null) {
+        const ebo = gl.createBuffer();
+
+        if(vbo !== null && ebo !== null) {
 
             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
 
@@ -79,61 +81,61 @@ function createStarVAO(gl: WebGL2RenderingContext, stars: Star[]): WebGLVertexAr
             gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 6*4, 2*4);
             gl.vertexAttribPointer(2, 1, gl.FLOAT, false, 6*4, 5*4);
 
-            const bufferData: number[] = Array(stars.length * 36);
+            // 4 verts per quad (because of instancing), 6 floats per vert
+            const vertBufferData: number[] = Array(stars.length * 4 * 6);
+
+            const elementBufferData: number[] = Array(stars.length * 1 * 6);
 
             const aspectRatio = gl.drawingBufferHeight/gl.drawingBufferWidth;
 
             for(const [i, star] of stars.entries()) {
+                elementBufferData[i * 6 + 0] = i * 4 + 0;
+                elementBufferData[i * 6 + 1] = i * 4 + 1;
+                elementBufferData[i * 6 + 2] = i * 4 + 2;
+                elementBufferData[i * 6 + 3] = i * 4 + 0;
+                elementBufferData[i * 6 + 4] = i * 4 + 2;
+                elementBufferData[i * 6 + 5] = i * 4 + 3;
+
                 const xSize = star.size / gl.drawingBufferWidth;
                 const ySize = xSize / aspectRatio;
     
-                bufferData[i * 36 +  0] = star.x - xSize/2;
-                bufferData[i * 36 +  1] = star.y - ySize/2;
-                bufferData[i * 36 +  2] = star.r;
-                bufferData[i * 36 +  3] = star.g;
-                bufferData[i * 36 +  4] = star.b;
-                bufferData[i * 36 +  5] = star.shimmerOffset;
+                vertBufferData[i * 24 +  0] = star.x - xSize/2;
+                vertBufferData[i * 24 +  1] = star.y - ySize/2;
+                vertBufferData[i * 24 +  2] = star.r;
+                vertBufferData[i * 24 +  3] = star.g;
+                vertBufferData[i * 24 +  4] = star.b;
+                vertBufferData[i * 24 +  5] = star.shimmerOffset;
 
-                bufferData[i * 36 +  6] = star.x - xSize/2;
-                bufferData[i * 36 +  7] = star.y + ySize/2;
-                bufferData[i * 36 +  8] = star.r;
-                bufferData[i * 36 +  9] = star.g;
-                bufferData[i * 36 + 10] = star.b;
-                bufferData[i * 36 + 11] = star.shimmerOffset;
+                vertBufferData[i * 24 +  6] = star.x - xSize/2;
+                vertBufferData[i * 24 +  7] = star.y + ySize/2;
+                vertBufferData[i * 24 +  8] = star.r;
+                vertBufferData[i * 24 +  9] = star.g;
+                vertBufferData[i * 24 + 10] = star.b;
+                vertBufferData[i * 24 + 11] = star.shimmerOffset;
 
-                bufferData[i * 36 + 12] = star.x + xSize/2;
-                bufferData[i * 36 + 13] = star.y + ySize/2;
-                bufferData[i * 36 + 14] = star.r;
-                bufferData[i * 36 + 15] = star.g;
-                bufferData[i * 36 + 16] = star.b;
-                bufferData[i * 36 + 17] = star.shimmerOffset;
+                vertBufferData[i * 24 + 12] = star.x + xSize/2;
+                vertBufferData[i * 24 + 13] = star.y + ySize/2;
+                vertBufferData[i * 24 + 14] = star.r;
+                vertBufferData[i * 24 + 15] = star.g;
+                vertBufferData[i * 24 + 16] = star.b;
+                vertBufferData[i * 24 + 17] = star.shimmerOffset;
 
-                bufferData[i * 36 + 18] = star.x - xSize/2;
-                bufferData[i * 36 + 19] = star.y - ySize/2;
-                bufferData[i * 36 + 20] = star.r;
-                bufferData[i * 36 + 21] = star.g;
-                bufferData[i * 36 + 22] = star.b;
-                bufferData[i * 36 + 23] = star.shimmerOffset;
-
-                bufferData[i * 36 + 24] = star.x + xSize/2;
-                bufferData[i * 36 + 25] = star.y + ySize/2;
-                bufferData[i * 36 + 26] = star.r;
-                bufferData[i * 36 + 27] = star.g;
-                bufferData[i * 36 + 28] = star.b;
-                bufferData[i * 36 + 29] = star.shimmerOffset;
-
-                bufferData[i * 36 + 30] = star.x + xSize/2;
-                bufferData[i * 36 + 31] = star.y - ySize/2;
-                bufferData[i * 36 + 32] = star.r;
-                bufferData[i * 36 + 33] = star.g;
-                bufferData[i * 36 + 34] = star.b;
-                bufferData[i * 36 + 35] = star.shimmerOffset;
+                vertBufferData[i * 24 + 18] = star.x + xSize/2;
+                vertBufferData[i * 24 + 19] = star.y - ySize/2;
+                vertBufferData[i * 24 + 20] = star.r;
+                vertBufferData[i * 24 + 21] = star.g;
+                vertBufferData[i * 24 + 22] = star.b;
+                vertBufferData[i * 24 + 23] = star.shimmerOffset;
             }
 
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bufferData), gl.STATIC_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertBufferData), gl.STATIC_DRAW);
+
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(elementBufferData), gl.STATIC_DRAW);
+
             return vao;
         } else {
-            console.error("Failed to create star VBO");
+            console.error("Failed to create star VBO and EBO");
             return null;
         }
     } else {

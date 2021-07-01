@@ -9,8 +9,7 @@ function createRenderLoop(gl: WebGL2RenderingContext, starContext: star.StarRend
 
         gl.useProgram(starContext.program);
         gl.bindVertexArray(starContext.vao);
-        gl.drawArrays(gl.TRIANGLES, 0, starContext.nStars * 6);
-        
+        gl.drawElements(gl.TRIANGLES, starContext.nStars * 4, gl.UNSIGNED_SHORT, 0);
         requestAnimationFrame(draw);
     }
 
