@@ -9,7 +9,6 @@ function createRenderLoop(gl: WebGL2RenderingContext, starContext: star.StarRend
 
         gl.useProgram(starContext.program);
         gl.bindVertexArray(starContext.vao);
-    
         gl.drawArrays(gl.POINTS, 0, starContext.nStars);
         
         requestAnimationFrame(draw);
@@ -34,6 +33,8 @@ document.body.onload = () => {
 
         const gl = canvas.getContext("webgl2");
         if(gl) {
+            gl.viewport(0, 0, canvas.width, canvas.height);
+
             star.createStarContext(gl, 1000).then(starContext => {
                 if(starContext !== null) {
                     createRenderLoop(gl, starContext);
