@@ -1,23 +1,15 @@
 import * as glh from "./gl_helpers.js";
+import * as star from "./star_vao.js";
 
-type Point = {
-    x: number,
-    y: number
-}
-
-function getRandomPoint(): Point {
-    return {x: Math.random() * 2 - 1, y: Math.random() * 2 - 1}
-}
-
-function createRenderLoop(gl: WebGL2RenderingContext, starVAO: WebGLVertexArrayObject, starShaderProgram: WebGLProgram) {
+function createRenderLoop(gl: WebGL2RenderingContext, starContext: star.StarRenderContext, starShaderProgram: WebGLProgram) {
     const draw = () => {
         gl.clearColor(0, 0, 0, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
     
         gl.useProgram(starShaderProgram);
-        gl.bindVertexArray(starVAO);
+        gl.bindVertexArray(starContext.vao);
     
-        gl.drawArrays(gl.POINTS, 0, 2);
+        gl.drawArrays(gl.POINTS, 0, starContext.nStars);
         requestAnimationFrame(draw);
     }
 
@@ -35,25 +27,10 @@ document.body.onload = () => {
                 if(starShaderProgram !== null) {
                     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-                    const starVAO =  gl.createVertexArray();
-                    if(starVAO !== null) {
-                        gl.bindVertexArray(starVAO);
-                        const starVBO = gl.createBuffer();
-                        if(starVBO !== null) {
-                            gl.bindBuffer(gl.ARRAY_BUFFER, starVBO);
-
-                            gl.enableVertexAttribArray(0);
-                            gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 2*4, 0);
-
-                            const positions = new Float32Array([0, 0.5, 0.3, -0.3]);
-                            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-                            createRenderLoop(gl, starVAO, starShaderProgram);
-                        } else {
-                            console.error("Failed to create star VBO");
-                        }
-                    } else {
-                        console.error("Failed to create star VAO");
+                    const stars = star.getRandomStars(100);
+                    const starContext =  star.createStarVAO(gl, stars);
+                    if(starContext !== null) {
+                        createRenderLoop(gl, starContext, starShaderProgram);
                     }
                 }
             });
