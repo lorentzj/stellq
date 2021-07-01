@@ -6,7 +6,7 @@ function createRenderLoop(gl, starContext) {
         starContext.updateShimmerTimer((new Date()).getTime());
         gl.useProgram(starContext.program);
         gl.bindVertexArray(starContext.vao);
-        gl.drawArrays(gl.POINTS, 0, starContext.nStars);
+        gl.drawArrays(gl.TRIANGLES, 0, starContext.nStars * 6);
         requestAnimationFrame(draw);
     };
     draw();
@@ -22,10 +22,12 @@ document.body.onload = () => {
         const devicePixelRatio = window.devicePixelRatio || 1;
         canvas.width = Math.round(cWidth * devicePixelRatio);
         canvas.height = Math.round(cHeight * devicePixelRatio);
-        const gl = canvas.getContext("webgl2");
+        const gl = canvas.getContext("webgl2", { premultipliedAlpha: false });
         if (gl) {
             gl.viewport(0, 0, canvas.width, canvas.height);
-            star.createStarContext(gl, 1000).then(starContext => {
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            star.createStarContext(gl, 500).then(starContext => {
                 if (starContext !== null) {
                     createRenderLoop(gl, starContext);
                 }

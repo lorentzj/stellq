@@ -13,6 +13,7 @@ type Star = {
     r: number,
     g: number,
     b: number,
+    size: number,
     shimmerOffset: number
 }
 
@@ -23,6 +24,7 @@ function getRandomStar(): Star {
         r: Math.random(),
         g: Math.random() + 0.3,
         b: Math.random() + 0.5,
+        size: Math.random() * 10,
         shimmerOffset: Math.random() * 6.28
     }
 }
@@ -77,14 +79,55 @@ function createStarVAO(gl: WebGL2RenderingContext, stars: Star[]): WebGLVertexAr
             gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 6*4, 2*4);
             gl.vertexAttribPointer(2, 1, gl.FLOAT, false, 6*4, 5*4);
 
-            const bufferData: number[] = Array(stars.length * 6);
+            const bufferData: number[] = Array(stars.length * 36);
+
+            const aspectRatio = gl.drawingBufferHeight/gl.drawingBufferWidth;
+
             for(const [i, star] of stars.entries()) {
-                bufferData[i * 6 + 0] = star.x
-                bufferData[i * 6 + 1] = star.y;
-                bufferData[i * 6 + 2] = star.r;
-                bufferData[i * 6 + 3] = star.g;
-                bufferData[i * 6 + 4] = star.b;
-                bufferData[i * 6 + 5] = star.shimmerOffset;
+                const xSize = star.size / gl.drawingBufferWidth;
+                const ySize = xSize / aspectRatio;
+    
+                bufferData[i * 36 +  0] = star.x - xSize/2;
+                bufferData[i * 36 +  1] = star.y - ySize/2;
+                bufferData[i * 36 +  2] = star.r;
+                bufferData[i * 36 +  3] = star.g;
+                bufferData[i * 36 +  4] = star.b;
+                bufferData[i * 36 +  5] = star.shimmerOffset;
+
+                bufferData[i * 36 +  6] = star.x - xSize/2;
+                bufferData[i * 36 +  7] = star.y + ySize/2;
+                bufferData[i * 36 +  8] = star.r;
+                bufferData[i * 36 +  9] = star.g;
+                bufferData[i * 36 + 10] = star.b;
+                bufferData[i * 36 + 11] = star.shimmerOffset;
+
+                bufferData[i * 36 + 12] = star.x + xSize/2;
+                bufferData[i * 36 + 13] = star.y + ySize/2;
+                bufferData[i * 36 + 14] = star.r;
+                bufferData[i * 36 + 15] = star.g;
+                bufferData[i * 36 + 16] = star.b;
+                bufferData[i * 36 + 17] = star.shimmerOffset;
+
+                bufferData[i * 36 + 18] = star.x - xSize/2;
+                bufferData[i * 36 + 19] = star.y - ySize/2;
+                bufferData[i * 36 + 20] = star.r;
+                bufferData[i * 36 + 21] = star.g;
+                bufferData[i * 36 + 22] = star.b;
+                bufferData[i * 36 + 23] = star.shimmerOffset;
+
+                bufferData[i * 36 + 24] = star.x + xSize/2;
+                bufferData[i * 36 + 25] = star.y + ySize/2;
+                bufferData[i * 36 + 26] = star.r;
+                bufferData[i * 36 + 27] = star.g;
+                bufferData[i * 36 + 28] = star.b;
+                bufferData[i * 36 + 29] = star.shimmerOffset;
+
+                bufferData[i * 36 + 30] = star.x + xSize/2;
+                bufferData[i * 36 + 31] = star.y - ySize/2;
+                bufferData[i * 36 + 32] = star.r;
+                bufferData[i * 36 + 33] = star.g;
+                bufferData[i * 36 + 34] = star.b;
+                bufferData[i * 36 + 35] = star.shimmerOffset;
             }
 
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bufferData), gl.STATIC_DRAW);
