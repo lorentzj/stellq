@@ -1,15 +1,17 @@
-import * as glh from "./gl_helpers.js";
-import * as star from "./star_vao.js";
+import * as star from "./star_context.js";
 
-function createRenderLoop(gl: WebGL2RenderingContext, starContext: star.StarRenderContext, starShaderProgram: WebGLProgram) {
+function createRenderLoop(gl: WebGL2RenderingContext, starContext: star.StarRenderContext) {
     const draw = () => {
         gl.clearColor(0, 0, 0, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
     
-        gl.useProgram(starShaderProgram);
+        starContext.updateShimmerTimer((new Date()).getTime());
+
+        gl.useProgram(starContext.program);
         gl.bindVertexArray(starContext.vao);
     
         gl.drawArrays(gl.POINTS, 0, starContext.nStars);
+        
         requestAnimationFrame(draw);
     }
 
@@ -23,15 +25,9 @@ document.body.onload = () => {
         canvasElements[0].height = document.body.clientHeight*3/4;
         const gl = canvasElements[0].getContext("webgl2");
         if(gl) {
-            glh.compileShaderProgram("./glsl/star.vert", "./glsl/star.frag", gl).then(starShaderProgram =>{
-                if(starShaderProgram !== null) {
-                    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-                    const stars = star.getRandomStars(100);
-                    const starContext =  star.createStarVAO(gl, stars);
-                    if(starContext !== null) {
-                        createRenderLoop(gl, starContext, starShaderProgram);
-                    }
+            star.createStarContext(gl, 1000).then(starContext => {
+                if(starContext !== null) {
+                    createRenderLoop(gl, starContext);
                 }
             });
         } else {
