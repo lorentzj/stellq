@@ -61,6 +61,14 @@ export function createStarContext(gl: WebGL2RenderingContext, nStars: number): P
     });
 }
 
+export function renderStars(gl: WebGL2RenderingContext, starContext: StarRenderContext) {
+    starContext.updateShimmerTimer((new Date()).getTime());
+
+    gl.useProgram(starContext.program);
+    gl.bindVertexArray(starContext.vao);
+    gl.drawElements(gl.TRIANGLES, starContext.nStars * 4, gl.UNSIGNED_SHORT, 0);
+}
+
 function createStarVAO(gl: WebGL2RenderingContext, stars: Star[]): WebGLVertexArrayObject | null {
     const vao =  gl.createVertexArray();
     if(vao !== null) {
@@ -89,9 +97,11 @@ function createStarVAO(gl: WebGL2RenderingContext, stars: Star[]): WebGLVertexAr
             const aspectRatio = gl.drawingBufferHeight/gl.drawingBufferWidth;
 
             for(const [i, star] of stars.entries()) {
+                // first triangle of square
                 elementBufferData[i * 6 + 0] = i * 4 + 0;
                 elementBufferData[i * 6 + 1] = i * 4 + 1;
                 elementBufferData[i * 6 + 2] = i * 4 + 2;
+                // second triangle of square
                 elementBufferData[i * 6 + 3] = i * 4 + 0;
                 elementBufferData[i * 6 + 4] = i * 4 + 2;
                 elementBufferData[i * 6 + 5] = i * 4 + 3;
