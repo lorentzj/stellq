@@ -21,9 +21,18 @@ function createRenderLoop(gl: WebGL2RenderingContext, starContext: star.StarRend
 document.body.onload = () => {
     const canvasElements = document.getElementsByTagName("canvas");
     if(canvasElements.length !== 0) {
-        canvasElements[0].width = document.body.clientWidth;
-        canvasElements[0].height = document.body.clientHeight*3/4;
-        const gl = canvasElements[0].getContext("webgl2");
+        const canvas = canvasElements[0];
+        const cWidth = Math.round(document.body.clientWidth);
+        const cHeight = Math.round(document.body.clientHeight * 0.75);
+
+        canvas.style.width = cWidth.toString() + "px";
+        canvas.style.height = cHeight.toString() + "px";
+
+        const devicePixelRatio = window.devicePixelRatio || 1;
+        canvas.width = Math.round(cWidth * devicePixelRatio);
+        canvas.height = Math.round(cHeight * devicePixelRatio);
+
+        const gl = canvas.getContext("webgl2");
         if(gl) {
             star.createStarContext(gl, 1000).then(starContext => {
                 if(starContext !== null) {
@@ -36,4 +45,4 @@ document.body.onload = () => {
     } else {
         console.error("No canvas element found.");
     }
-};
+}
